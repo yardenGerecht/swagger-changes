@@ -1,0 +1,748 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "Backend API Server.",
+    "version": "1.0.0"
+  },
+  "host": "feed-demo.dev.lightricks.com",
+  "basePath": "/api/v1",
+  "paths": {
+    "/social/accounts/me/followers/count": {
+      "get": {
+        "tags": [
+          "follow"
+        ],
+        "summary": "Number of followers of my account.",
+        "operationId": "getMyFollowersCuntRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCountResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/accounts/me/following/count": {
+      "get": {
+        "tags": [
+          "follow"
+        ],
+        "summary": "Number of following of my account.",
+        "operationId": "getMyFollowingCuntRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCountResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/accounts/{id}/follow": {
+      "put": {
+        "description": "In case account is already followed 304 is returned.",
+        "tags": [
+          "follow"
+        ],
+        "summary": "Follow account. ID is account ID to follow.",
+        "operationId": "putFollow",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "304": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      },
+      "delete": {
+        "description": "In case account wad not followed 304 is returned.",
+        "tags": [
+          "follow"
+        ],
+        "summary": "Unfollow account. ID is account ID to unfollow.",
+        "operationId": "deleteFollow",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "304": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/accounts/{id}/followers/count": {
+      "get": {
+        "tags": [
+          "follow"
+        ],
+        "summary": "Number of followers of account. ID is account id.",
+        "operationId": "getFollowersCuntRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCountResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/accounts/{id}/following/count": {
+      "get": {
+        "tags": [
+          "follow"
+        ],
+        "summary": "Number of following of account. ID is account id.",
+        "operationId": "getFollowingCuntRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCountResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/accounts/{id}/is_followed": {
+      "get": {
+        "tags": [
+          "follow"
+        ],
+        "summary": "Is account followed by me. ID is the Account ID in question.",
+        "operationId": "isFollowed",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getActionResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/posts/{id}/is_liked": {
+      "get": {
+        "tags": [
+          "like"
+        ],
+        "summary": "Is post liked by me. ID is the post ID in question.",
+        "operationId": "isLiked",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getActionResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/posts/{id}/is_saved": {
+      "get": {
+        "tags": [
+          "save"
+        ],
+        "summary": "Is post saved by me. ID is the post ID in question.",
+        "operationId": "isSaved",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getActionResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/posts/{id}/like": {
+      "put": {
+        "description": "In case posts is already liked 304 is returned",
+        "tags": [
+          "like"
+        ],
+        "summary": "Like post. ID is the ID of the post being liked.",
+        "operationId": "putLike",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "304": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      },
+      "delete": {
+        "description": "In case post is not liked by the user 304 is returned",
+        "tags": [
+          "like"
+        ],
+        "summary": "Unlike post. ID is the ID of the post being unliked.",
+        "operationId": "deleteLike",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "304": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/posts/{id}/likes/count": {
+      "get": {
+        "tags": [
+          "like"
+        ],
+        "summary": "Number of likes for post. ID is post id.",
+        "operationId": "getPostLikesCuntRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCountResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/posts/{id}/save": {
+      "put": {
+        "description": "In case post is already saved 304 is returned",
+        "tags": [
+          "save"
+        ],
+        "summary": "Save post. ID is the ID of the post being saved.",
+        "operationId": "putSave",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "304": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      },
+      "delete": {
+        "description": "In case post is not saved by the user 304 is returned.",
+        "tags": [
+          "save"
+        ],
+        "summary": "Unsave post. ID is the ID of the post being saved.",
+        "operationId": "deleteSave",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "304": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/social/status": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Check social status (health).",
+        "operationId": "statusEndpoint",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/statusResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ErrorBody": {
+      "type": "object",
+      "properties": {
+        "error_code": {
+          "$ref": "#/definitions/ExternalErrorCode"
+        },
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/common/pkg/http/errors"
+    },
+    "ExternalErrorCode": {
+      "type": "string",
+      "x-go-package": "github.com/Lightricks/atlas-core/common/pkg/http/errors"
+    },
+    "GetActionResponseBody": {
+      "type": "object",
+      "required": [
+        "response"
+      ],
+      "properties": {
+        "response": {
+          "type": "boolean",
+          "x-go-name": "Response"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-social/pkg/api/actions/model"
+    },
+    "GetCountResponseBody": {
+      "type": "object",
+      "required": [
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Count"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-social/pkg/api/actions/model"
+    },
+    "StatusResponse": {
+      "type": "object",
+      "title": "StatusResponse represents body of status response.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "x-go-name": "Status"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-social/pkg/api"
+    }
+  },
+  "responses": {
+    "ErrorWrapper": {
+      "description": "Relevant for all error codes (4XX, 5XX). While the message can change the error_code shouldn't (id of the error).",
+      "schema": {
+        "$ref": "#/definitions/ErrorBody"
+      }
+    },
+    "getActionResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/GetActionResponseBody"
+      }
+    },
+    "getCountResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/GetCountResponseBody"
+      },
+      "headers": {
+        "X-Total-Count": {
+          "type": "string",
+          "description": "Max total number of items.\nin: header\nrequired: true"
+        }
+      }
+    },
+    "statusResponse": {
+      "description": "Status of social.",
+      "schema": {
+        "$ref": "#/definitions/StatusResponse"
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic"
+    }
+  }
+}

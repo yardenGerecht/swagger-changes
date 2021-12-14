@@ -1,0 +1,1379 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "Backend API Server.",
+    "version": "1.0.0"
+  },
+  "host": "feed-demo.dev.lightricks.com",
+  "basePath": "/api/v1",
+  "paths": {
+    "/authorization": {
+      "get": {
+        "description": "Return the account (if exists) for the user (ltid) extracted from the token",
+        "tags": [
+          "auth"
+        ],
+        "operationId": "AuthorizationCheckRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/AuthorizationResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "401": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/authorization/debug_tools/basic_auth/{ltid}": {
+      "get": {
+        "tags": [
+          "debug_tools"
+        ],
+        "summary": "Debug tool which helps create basic auth from ltid.",
+        "operationId": "GetBasicAuth",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "LTID",
+            "description": "e.g.: jUFNaVnOX_zNB8nccsW4\ntype: string",
+            "name": "ltid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/GetBasicAuthResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/clients/register": {
+      "put": {
+        "description": "Register installation info. After app is installed in the first time, this api call must be the first call to\nany feed endpoint. This call register the client (installation) in our system. A user, account and profile are being\ncreated (or linked if there are already a user, account and profile with the same ltid) only when setting\nAuthorization header in the first time (fortress jwt token which contains the LTID). You can call this endpoint\nas many times you want (e.g. every time app starts) and resources will be updated only if needed.\nYou can call this endpoint even without Authorization header (LTID), if you want to give user some kind of\n\"read only\" experience (user, account and profile aren't being created).\nIf user logout and login with a different account in the app (LTID is being changed) just call this endpoint again\nwith the new JWT and same client_id and we will update the link between this client and his new/existing user,\naccount and profile.",
+        "tags": [
+          "register"
+        ],
+        "operationId": "putRegister",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/PutRegisterRequestBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/PutRegisterResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/profiles/me": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Get my profile info.",
+        "operationId": "getMyProfile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "x-go-name": "Embed",
+            "description": "Fields to be embedded in response.\nIn this case, only these fields are supported:\n[\"social_links\", \"profile_picture\" , \"is_followed_by_me\", \"followers_count\", \"following_count\"].\nThis is how it should look in the uri: ...embed=social_links\u0026embed=profile_picture...",
+            "name": "embed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getProfileResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Patch profile info.",
+        "operationId": "patchProfile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "x-go-name": "Embed",
+            "description": "Fields to be embedded in response.\nIn this case, only these fields are supported: [\"social_links\", \"profile_picture\"].\nThis is how it should look in the uri: ...embed=social_links\u0026embed=profile_picture...",
+            "name": "embed",
+            "in": "query"
+          },
+          {
+            "description": "To remove any property from profile, set it to empty string and field will be set to null.",
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/PatchProfileRequestBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/patchProfileResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          },
+          "409": {
+            "description": "if username already exists",
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/profiles/me/followers": {
+      "get": {
+        "tags": [
+          "followers"
+        ],
+        "summary": "Get my followers.",
+        "operationId": "getMyFollowersRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 0,
+            "x-go-name": "Offset",
+            "description": "Start position. Stats from zero. Inclusive.",
+            "name": "offset",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 12,
+            "x-go-name": "Limit",
+            "description": "Max number of items to return.\nDefault value is 12.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "x-go-name": "Embed",
+            "description": "Fields to be embedded in response.\nIn this case, only these fields are supported:\n[\"profile_picture\" , \"is_followed_by_me\",].\nThis is how it should look in the uri: ...embed=is_followed_by_me\u0026embed=profile_picture...",
+            "name": "embed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getFollowersResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/profiles/me/following": {
+      "get": {
+        "tags": [
+          "followers"
+        ],
+        "summary": "Get accounts I follow.",
+        "operationId": "getMyFollowingRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 0,
+            "x-go-name": "Offset",
+            "description": "Start position. Stats from zero. Inclusive.",
+            "name": "offset",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 12,
+            "x-go-name": "Limit",
+            "description": "Max number of items to return.\nDefault value is 12.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "x-go-name": "Embed",
+            "description": "Fields to be embedded in response.\nIn this case, only these fields are supported:\n[\"profile_picture\" , \"is_followed_by_me\",].\nThis is how it should look in the uri: ...embed=is_followed_by_me\u0026embed=profile_picture...",
+            "name": "embed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getFollowersResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/profiles/me/social_links/{social_type}": {
+      "put": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Upsert social link to profile. If profile already has social link with this type, the handle will be updated.",
+        "operationId": "putSocialLink",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "enum": [
+              "facebook",
+              "twitter",
+              "youtube",
+              "instagram",
+              "soundcloud",
+              "bandcamp",
+              "linkedin",
+              "clubhouse",
+              "substack",
+              "whatsapp",
+              "telegram",
+              "signal",
+              "twitch",
+              "patreon",
+              "cameo",
+              "pinterest",
+              "tiktok",
+              "spotify",
+              "amazon",
+              "applemusic",
+              "snapchat",
+              "venmo",
+              "etsy",
+              "poshmark"
+            ],
+            "type": "string",
+            "x-go-name": "SocialType",
+            "name": "social_type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "This text will appear as description of your request body.",
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/PutSocialLinkRequestBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/putSocialLinkResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Delete social link from profile.",
+        "operationId": "deleteSocialLink",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "enum": [
+              "facebook",
+              "twitter",
+              "youtube",
+              "instagram",
+              "soundcloud",
+              "bandcamp",
+              "linkedin",
+              "clubhouse",
+              "substack",
+              "whatsapp",
+              "telegram",
+              "signal",
+              "twitch",
+              "patreon",
+              "cameo",
+              "pinterest",
+              "tiktok",
+              "spotify",
+              "amazon",
+              "applemusic",
+              "snapchat",
+              "venmo",
+              "etsy",
+              "poshmark"
+            ],
+            "type": "string",
+            "x-go-name": "SocialType",
+            "name": "social_type",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/profiles/status": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Check profile status (health).",
+        "operationId": "statusEndpoint",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/statusResponse"
+          }
+        }
+      }
+    },
+    "/profiles/{account_id}": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Get profile info by account id.",
+        "operationId": "getProfile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "AccountId",
+            "description": "This text will appear as description of your request body.\ntype: string\nname: tags",
+            "name": "account_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "x-go-name": "Embed",
+            "description": "Fields to be embedded in response.\nIn this case, only these fields are supported:\n[\"social_links\", \"profile_picture\" , \"is_followed_by_me\", \"followers_count\", \"following_count\"].\nThis is how it should look in the uri: ...embed=social_links\u0026embed=profile_picture...",
+            "name": "embed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getProfileResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/profiles/{account_id}/followers": {
+      "get": {
+        "tags": [
+          "followers"
+        ],
+        "summary": "Get followers for account.",
+        "operationId": "getFollowersRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 0,
+            "x-go-name": "Offset",
+            "description": "Start position. Stats from zero. Inclusive.",
+            "name": "offset",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 12,
+            "x-go-name": "Limit",
+            "description": "Max number of items to return.\nDefault value is 12.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "x-go-name": "Embed",
+            "description": "Fields to be embedded in response.\nIn this case, only these fields are supported:\n[\"profile_picture\" , \"is_followed_by_me\",].\nThis is how it should look in the uri: ...embed=is_followed_by_me\u0026embed=profile_picture...",
+            "name": "embed",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "AccountId",
+            "name": "account_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getFollowersResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    },
+    "/profiles/{account_id}/following": {
+      "get": {
+        "tags": [
+          "followers"
+        ],
+        "summary": "Get following for account.",
+        "operationId": "getFollowingRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientId",
+            "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45",
+            "name": "x-lightricks-client-id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 0,
+            "x-go-name": "Offset",
+            "description": "Start position. Stats from zero. Inclusive.",
+            "name": "offset",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "example": 12,
+            "x-go-name": "Limit",
+            "description": "Max number of items to return.\nDefault value is 12.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "x-go-name": "Embed",
+            "description": "Fields to be embedded in response.\nIn this case, only these fields are supported:\n[\"profile_picture\" , \"is_followed_by_me\",].\nThis is how it should look in the uri: ...embed=is_followed_by_me\u0026embed=profile_picture...",
+            "name": "embed",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "AccountId",
+            "name": "account_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getFollowersResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorWrapper"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AppCapability": {
+      "type": "object",
+      "properties": {
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Capabilities",
+          "example": [
+            "audio_speed_very_slow",
+            "text_shadow_softness"
+          ]
+        },
+        "template_type": {
+          "$ref": "#/definitions/TemplateType"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/register/model"
+    },
+    "AuthorizationResponseBody": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "x-go-name": "AccountId"
+        },
+        "ltid": {
+          "type": "string",
+          "x-go-name": "Ltid"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/auth/model"
+    },
+    "ErrorBody": {
+      "type": "object",
+      "properties": {
+        "error_code": {
+          "$ref": "#/definitions/ExternalErrorCode"
+        },
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/common/pkg/http/errors"
+    },
+    "ExternalErrorCode": {
+      "type": "string",
+      "x-go-package": "github.com/Lightricks/atlas-core/common/pkg/http/errors"
+    },
+    "FileUploadRequest": {
+      "type": "object",
+      "required": [
+        "Authorization",
+        "x-lightricks-client-id"
+      ],
+      "properties": {
+        "Authorization": {
+          "description": "Should contain Fortress token (JWT) as bearer token.  Value format: \"Bearer {User's Fortress token}\"\nin: header",
+          "type": "string"
+        },
+        "FileUploadRequestBody": {
+          "$ref": "#/definitions/FileUploadRequestBody"
+        },
+        "x-lightricks-client-id": {
+          "description": "Installation identifier. Should be: {platform}\\:{app name}:{platform id}.\nWhere platform id is installation id in android and id for vendor in iOS.\ne.g. videoleap Android: android:videoleap:01FEAE4TX8B5RR8ENAZJT2CBDK\ne.g. artleap iOS: ios:artleap:B55C2749-2B68-4371-92AE-D0CB18ACFF45\nin: header",
+          "type": "string",
+          "x-go-name": "ClientId"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "FileUploadRequestBody": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "description": "in: body",
+          "type": "string",
+          "x-go-name": "ContentType"
+        },
+        "file_url": {
+          "description": "in: body",
+          "type": "string",
+          "x-go-name": "FileUrl"
+        },
+        "metadata": {
+          "$ref": "#/definitions/MetaDataModel"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "FileUploadResponseBody": {
+      "type": "object",
+      "properties": {
+        "media_id": {
+          "type": "string",
+          "x-go-name": "MediaId"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "FollowersResponseBody": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GetProfileResponseBody"
+          },
+          "x-go-name": "Results"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/follow/model"
+    },
+    "GetBasicAuthResponseBody": {
+      "type": "object",
+      "properties": {
+        "basic_auth": {
+          "type": "string",
+          "x-go-name": "BasicAuth"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/auth/model"
+    },
+    "GetProfileResponseBody": {
+      "type": "object",
+      "title": "GetProfileResponseBody represents response body of Get Profile.",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "x-go-name": "AccountId"
+        },
+        "bio": {
+          "type": "string",
+          "x-go-name": "Bio"
+        },
+        "followers_count": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "FollowersCount"
+        },
+        "following_count": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "FollowingCount"
+        },
+        "full_name": {
+          "type": "string",
+          "x-go-name": "FullName"
+        },
+        "is_followed_by_me": {
+          "type": "boolean",
+          "x-go-name": "IsFollowedByMe"
+        },
+        "profile_picture": {
+          "$ref": "#/definitions/Metadata"
+        },
+        "social_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SocialLinkResponse"
+          },
+          "x-go-name": "SocialLinks"
+        },
+        "username": {
+          "type": "string",
+          "x-go-name": "Username"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/profile/model"
+    },
+    "HttpInstruction": {
+      "description": "HttpInstruction includes instructions for uploading files in http protocol",
+      "type": "object",
+      "properties": {
+        "form_data_parts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-go-name": "FormDataParts"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-go-name": "Headers"
+        },
+        "http_protocol": {
+          "type": "string",
+          "x-go-name": "HttpProtocol"
+        },
+        "url": {
+          "type": "string",
+          "x-go-name": "Url"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "Instruction": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "x-go-name": "AccountId"
+        },
+        "client_id": {
+          "type": "string",
+          "x-go-name": "ClientId"
+        },
+        "http_instruction": {
+          "$ref": "#/definitions/HttpInstruction"
+        },
+        "media_id": {
+          "type": "string",
+          "x-go-name": "MediaId"
+        },
+        "media_resource_status": {
+          "type": "string",
+          "enum": [
+            "Started",
+            "Uploaded",
+            "Ready",
+            "Error"
+          ],
+          "x-go-name": "MediaResourceStatus"
+        },
+        "resource_type": {
+          "description": "Original/thumbnail100_100/transcoded/streamable",
+          "type": "string",
+          "x-go-name": "ResourceType"
+        },
+        "token_expiration_at_ms": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "TokenExpirationInMinutes"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "InstructionsGetRequest": {
+      "type": "object",
+      "required": [
+        "file_size",
+        "file_content_md5",
+        "content_type"
+      ],
+      "properties": {
+        "content_type": {
+          "description": "in: body",
+          "type": "string",
+          "x-go-name": "ContentType"
+        },
+        "file_content_md5": {
+          "description": "in: body",
+          "type": "string",
+          "x-go-name": "FileContentMd5"
+        },
+        "file_size": {
+          "description": "in: body",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "FileSize"
+        },
+        "metadata": {
+          "$ref": "#/definitions/MetaDataModel"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "MetaDataModel": {
+      "type": "object",
+      "properties": {
+        "animation_type": {
+          "type": "string",
+          "x-go-name": "AnimationType"
+        },
+        "audio_channels": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "AudioChannels"
+        },
+        "audio_sample_rate": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "AudioSampleRate"
+        },
+        "average_fps": {
+          "type": "number",
+          "format": "float",
+          "x-go-name": "AverageFps"
+        },
+        "content_type": {
+          "type": "string",
+          "x-go-name": "ContentType"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "DurationMs"
+        },
+        "exif_creation_date_ms": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExifCreationDateMs"
+        },
+        "height": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Height"
+        },
+        "local_identifier": {
+          "type": "string",
+          "x-go-name": "LocalIdentifier"
+        },
+        "width": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Width"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "Metadata": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "description": "Account id that uploaded the media",
+          "type": "string",
+          "x-go-name": "AccountId"
+        },
+        "media_id": {
+          "type": "string",
+          "x-go-name": "MediaId"
+        },
+        "media_resources": {
+          "description": "media auto generated files with different protocols. valid only when the status is \"ready\".",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Resource"
+          },
+          "x-go-name": "MediaResources"
+        },
+        "media_status": {
+          "type": "string",
+          "enum": [
+            "Started",
+            "Uploaded",
+            "Ready",
+            "Error"
+          ],
+          "x-go-name": "MediaStatus"
+        },
+        "media_type": {
+          "type": "string",
+          "x-go-name": "MediaType"
+        },
+        "metadata": {
+          "$ref": "#/definitions/MetaDataModel"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "PatchMediaRequestBody": {
+      "type": "object",
+      "required": [
+        "transformation"
+      ],
+      "properties": {
+        "transformation": {
+          "description": "in: body",
+          "type": "string",
+          "x-go-name": "Transformation"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "PatchProfileRequestBody": {
+      "type": "object",
+      "properties": {
+        "bio": {
+          "description": "Allowed value (regex): \"^.{0,80}$\"",
+          "type": "string",
+          "x-go-name": "Bio"
+        },
+        "full_name": {
+          "description": "Allowed value (regex): \"^.{0,50}$\"",
+          "type": "string",
+          "x-go-name": "FullName"
+        },
+        "profile_picture_media_id": {
+          "type": "string",
+          "x-go-name": "ProfilePictureResourceId"
+        },
+        "username": {
+          "description": "Allowed value (regex): \"^[\\\\w\\\\.]{5,50}$\"",
+          "type": "string",
+          "x-go-name": "Username"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/profile/model"
+    },
+    "PutClientResponseBody": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "x-go-name": "AccountId"
+        },
+        "app_name": {
+          "type": "string",
+          "x-go-name": "AppName"
+        },
+        "app_version": {
+          "type": "string",
+          "x-go-name": "AppVersion"
+        },
+        "client_id": {
+          "type": "string",
+          "x-go-name": "ClientId"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "installation_id": {
+          "type": "string",
+          "x-go-name": "InstallationId"
+        },
+        "modified_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ModifiedAt"
+        },
+        "platform": {
+          "type": "string",
+          "x-go-name": "Platform"
+        },
+        "version_code": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "VersionCode"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/register/model"
+    },
+    "PutRegisterRequestBody": {
+      "type": "object",
+      "required": [
+        "installation_id",
+        "version_code",
+        "app_name",
+        "platform",
+        "app_capabilities"
+      ],
+      "properties": {
+        "app_capabilities": {
+          "description": "List of capabilities the app has. Templates are filtered according to the provided list.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppCapability"
+          },
+          "x-go-name": "AppCapabilities"
+        },
+        "app_name": {
+          "description": "Current supported values: [videoleap, artleap]",
+          "type": "string",
+          "x-go-name": "AppName",
+          "example": "videoleap"
+        },
+        "app_version": {
+          "description": "Semantic Versioning e.g. 1.5.0",
+          "type": "string",
+          "x-go-name": "AppVersion",
+          "example": "3.5.2"
+        },
+        "installation_id": {
+          "description": "Value should be installation id for Android and id for vendor for ios. Regex: \"^[\\w-]{20,100}$\"\nMust be unique per app (although not being enforced because id_for_vendor nature).",
+          "type": "string",
+          "x-go-name": "InstallationId",
+          "example": "01FEAE4TX8B5RR8ENAZJT2CBDK"
+        },
+        "platform": {
+          "description": "Current supported values: [ios, android]",
+          "type": "string",
+          "x-go-name": "Platform",
+          "example": "android"
+        },
+        "version_code": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "VersionCode",
+          "example": 457
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/register/model"
+    },
+    "PutSocialLinkRequestBody": {
+      "type": "object",
+      "properties": {
+        "handle": {
+          "description": "If exists this is the new username which might be different from the current username.",
+          "type": "string",
+          "x-go-name": "Handle"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/profile/model"
+    },
+    "Resource": {
+      "type": "object",
+      "properties": {
+        "average_fps": {
+          "type": "number",
+          "format": "float",
+          "x-go-name": "AverageFps"
+        },
+        "codec": {
+          "type": "string",
+          "x-go-name": "Codec"
+        },
+        "content_type": {
+          "type": "string",
+          "x-go-name": "ContentType"
+        },
+        "height": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Height"
+        },
+        "resource_type": {
+          "type": "string",
+          "enum": [
+            "original",
+            "thumbnail",
+            "transcoded",
+            "streamable"
+          ],
+          "x-go-name": "ResourceType"
+        },
+        "url": {
+          "type": "string",
+          "x-go-name": "Url"
+        },
+        "width": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Width"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
+    "SocialLinkResponse": {
+      "type": "object",
+      "properties": {
+        "handle": {
+          "type": "string",
+          "x-go-name": "Handle"
+        },
+        "link": {
+          "type": "string",
+          "x-go-name": "Link"
+        },
+        "type": {
+          "type": "string",
+          "x-go-name": "Type"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/profile/model"
+    },
+    "TemplateType": {
+      "type": "string",
+      "x-go-package": "github.com/Lightricks/atlas-profile/pkg/api/register/model"
+    }
+  },
+  "responses": {
+    "AuthorizationResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/AuthorizationResponseBody"
+      }
+    },
+    "ErrorWrapper": {
+      "description": "Relevant for all error codes (4XX, 5XX). While the message can change the error_code shouldn't (id of the error).",
+      "schema": {
+        "$ref": "#/definitions/ErrorBody"
+      }
+    },
+    "FileUploadResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/FileUploadResponseBody"
+      }
+    },
+    "GetBasicAuthResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/GetBasicAuthResponseBody"
+      }
+    },
+    "InstructionsGetResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Instruction"
+      }
+    },
+    "MediaMetadataGetByIdResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Metadata"
+      }
+    },
+    "MediaMetadataGetResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Metadata"
+        }
+      }
+    },
+    "PutRegisterResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/PutClientResponseBody"
+      }
+    },
+    "StatusResponse": {
+      "description": "",
+      "headers": {
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "getFollowersResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/FollowersResponseBody"
+      },
+      "headers": {
+        "X-Total-Count": {
+          "type": "string",
+          "description": "Max total number of items.\nin: header\nrequired: true"
+        }
+      }
+    },
+    "getProfileResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/GetProfileResponseBody"
+      }
+    },
+    "patchProfileResponse": {
+      "description": "Same response body as GET profile request except for socialLinks which isn't available in the patch request, although it appears below (as no embed query in request).",
+      "schema": {
+        "$ref": "#/definitions/GetProfileResponseBody"
+      }
+    },
+    "putSocialLinkResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/SocialLinkResponse"
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic"
+    }
+  }
+}
