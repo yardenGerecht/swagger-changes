@@ -13,7 +13,6 @@
     "title": "Backend API Server.",
     "version": "1.0.0"
   },
-  "host": "feed-demo.dev.lightricks.com",
   "basePath": "/api/v1",
   "paths": {
     "/social/accounts/me/followers/count": {
