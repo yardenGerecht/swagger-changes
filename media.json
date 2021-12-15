@@ -13,7 +13,6 @@
     "title": "Backend API Server.",
     "version": "1.0.0"
   },
-  "host": "feed-demo.dev.lightricks.com",
   "basePath": "/api/v1",
   "paths": {
     "/media/instructions": {
@@ -273,6 +272,9 @@
     },
     "FileUploadRequestBody": {
       "type": "object",
+      "required": [
+        "metadata"
+      ],
       "properties": {
         "content_type": {
           "description": "in: body",
@@ -290,19 +292,15 @@
       },
       "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
     },
-    "FileUploadResponseBody": {
-      "type": "object",
-      "properties": {
-        "media_id": {
-          "type": "string",
-          "x-go-name": "MediaId"
-        }
-      },
-      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
-    },
     "HttpInstruction": {
       "description": "HttpInstruction includes instructions for uploading files in http protocol",
       "type": "object",
+      "required": [
+        "http_protocol",
+        "url",
+        "headers",
+        "form_data_parts"
+      ],
       "properties": {
         "form_data_parts": {
           "type": "object",
@@ -331,14 +329,17 @@
     },
     "Instruction": {
       "type": "object",
+      "required": [
+        "token_expiration_at_ms",
+        "media_id",
+        "account_id",
+        "resource_type",
+        "http_instruction"
+      ],
       "properties": {
         "account_id": {
           "type": "string",
           "x-go-name": "AccountId"
-        },
-        "client_id": {
-          "type": "string",
-          "x-go-name": "ClientId"
         },
         "http_instruction": {
           "$ref": "#/definitions/HttpInstruction"
@@ -347,25 +348,16 @@
           "type": "string",
           "x-go-name": "MediaId"
         },
-        "media_resource_status": {
-          "type": "string",
-          "enum": [
-            "Started",
-            "Uploaded",
-            "Ready",
-            "Error"
-          ],
-          "x-go-name": "MediaResourceStatus"
-        },
         "resource_type": {
           "description": "Original/thumbnail100_100/transcoded/streamable",
           "type": "string",
           "x-go-name": "ResourceType"
         },
         "token_expiration_at_ms": {
+          "description": "In how many milliseconds, this token will expire.",
           "type": "integer",
           "format": "int64",
-          "x-go-name": "TokenExpirationInMinutes"
+          "x-go-name": "TokenExpirationInMs"
         }
       },
       "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
@@ -373,73 +365,45 @@
     "InstructionsGetRequest": {
       "type": "object",
       "required": [
-        "file_size",
-        "file_content_md5"
+        "file_content_md5",
+        "metadata"
       ],
       "properties": {
         "file_content_md5": {
-          "description": "in: body",
+          "description": "Provides a message-integrity check for the file.",
           "type": "string",
           "x-go-name": "FileContentMd5"
         },
-        "file_size": {
-          "description": "in: body",
-          "type": "integer",
-          "format": "uint64",
-          "x-go-name": "FileSize"
-        },
         "metadata": {
-          "$ref": "#/definitions/MetaDataModel"
+          "$ref": "#/definitions/PostInstructionsMetaData"
         }
       },
       "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
     },
     "MetaDataModel": {
       "type": "object",
+      "required": [
+        "content_type"
+      ],
       "properties": {
-        "animation_type": {
-          "type": "string",
-          "x-go-name": "AnimationType"
-        },
-        "audio_channels": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "AudioChannels"
-        },
-        "audio_sample_rate": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "AudioSampleRate"
-        },
-        "average_fps": {
-          "type": "number",
-          "format": "float",
-          "x-go-name": "AverageFps"
-        },
         "content_type": {
           "type": "string",
           "x-go-name": "ContentType"
         },
         "duration_ms": {
+          "description": "Required for videos.",
           "type": "integer",
           "format": "int64",
           "x-go-name": "DurationMs"
         },
-        "exif_creation_date_ms": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "ExifCreationDateMs"
-        },
         "height": {
+          "description": "Required for videos and images.",
           "type": "integer",
           "format": "int64",
           "x-go-name": "Height"
         },
-        "local_identifier": {
-          "type": "string",
-          "x-go-name": "LocalIdentifier"
-        },
         "width": {
+          "description": "Required for videos and images.",
           "type": "integer",
           "format": "int64",
           "x-go-name": "Width"
@@ -482,7 +446,7 @@
           "x-go-name": "MediaType"
         },
         "metadata": {
-          "$ref": "#/definitions/MetaDataModel"
+          "$ref": "#/definitions/PostInstructionsMetaData"
         }
       },
       "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
@@ -501,18 +465,47 @@
       },
       "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
     },
+    "PostInstructionsMetaData": {
+      "type": "object",
+      "required": [
+        "content_type",
+        "file_size"
+      ],
+      "properties": {
+        "content_type": {
+          "type": "string",
+          "x-go-name": "ContentType"
+        },
+        "duration_ms": {
+          "description": "Required for videos.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "DurationMs"
+        },
+        "file_size": {
+          "description": "File size in bytes",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "FileSize"
+        },
+        "height": {
+          "description": "Required for videos and images.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Height"
+        },
+        "width": {
+          "description": "Required for videos and images.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Width"
+        }
+      },
+      "x-go-package": "github.com/Lightricks/atlas-core/media/pkg/media"
+    },
     "Resource": {
       "type": "object",
       "properties": {
-        "average_fps": {
-          "type": "number",
-          "format": "float",
-          "x-go-name": "AverageFps"
-        },
-        "codec": {
-          "type": "string",
-          "x-go-name": "Codec"
-        },
         "content_type": {
           "type": "string",
           "x-go-name": "ContentType"
@@ -551,12 +544,6 @@
       "description": "Relevant for all error codes (4XX, 5XX). While the message can change the error_code shouldn't (id of the error).",
       "schema": {
         "$ref": "#/definitions/ErrorBody"
-      }
-    },
-    "FileUploadResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/FileUploadResponseBody"
       }
     },
     "InstructionsGetResponse": {
